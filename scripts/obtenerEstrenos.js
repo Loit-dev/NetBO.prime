@@ -9,29 +9,16 @@ const LANGUAGE = 'es-ES';
 
 // Plataformas
 const PLATAFORMAS = {
-  8: {
-    name: 'Netflix',
-    logo: '/logos/netflix.png'
-  },
-  337: {
-    name: 'Disney Plus',
-    logo: '/logos/disney.png'
-  },
-  119: {
-    name: 'Amazon Prime Video',
-    logo: '/logos/prime.png'
-  },
-  384: {
-    name: 'Max',
-    logo: '/logos/max.png'
-  }
+  8: { name: 'Netflix', logo: '/logos/netflix.png' },
+  337: { name: 'Disney Plus', logo: '/logos/disney.png' },
+  119: { name: 'Amazon Prime Video', logo: '/logos/prime.png' },
+  384: { name: 'Max', logo: '/logos/max.png' }
 };
 
 // Fecha últimos 7 días
 function obtenerFechaSemana() {
   const fecha = new Date();
   fecha.setDate(fecha.getDate() - 7);
-
   return fecha.toISOString().split('T')[0];
 }
 
@@ -41,36 +28,24 @@ const FECHA_SEMANA = obtenerFechaSemana();
 function hacerPeticion(url) {
   return new Promise((resolve, reject) => {
     https
-      .get(
-        url,
-        {
-          headers: {
-            'User-Agent': 'Mozilla/5.0'
+      .get(url, { headers: { 'User-Agent': 'Mozilla/5.0' } }, (res) => {
+        let data = '';
+
+        res.on('data', (chunk) => (data += chunk));
+
+        res.on('end', () => {
+          try {
+            resolve(JSON.parse(data));
+          } catch {
+            reject(new Error('Error procesando JSON'));
           }
-        },
-        (res) => {
-          let data = '';
-
-          res.on('data', (chunk) => {
-            data += chunk;
-          });
-
-          res.on('end', () => {
-            try {
-              resolve(JSON.parse(data));
-            } catch (error) {
-              reject(
-                new Error('Error procesando JSON')
-              );
-            }
-          });
-        }
-      )
+        });
+      })
       .on('error', reject);
   });
 }
 
-// Obtener trailers
+// Trailer
 async function obtenerTrailer(id, tipo) {
   try {
     const url =
@@ -80,12 +55,8 @@ async function obtenerTrailer(id, tipo) {
 
     const datos = await hacerPeticion(url);
 
-    if (!datos.results) return null;
-
-    const trailer = datos.results.find(
-      (video) =>
-        video.site === 'YouTube' &&
-        video.type === 'Trailer'
+    const trailer = (datos.results || []).find(
+      (v) => v.site === 'YouTube' && v.type === 'Trailer'
     );
 
     return trailer
@@ -96,37 +67,21 @@ async function obtenerTrailer(id, tipo) {
   }
 }
 
-// Obtener géneros
+// Géneros
 async function obtenerGeneros(tipo) {
   const url =
     `https://api.themoviedb.org/3/genre/${tipo}/list` +
-    `?api_key=${API_KEY}` +
-    `&language=${LANGUAGE}`;
+    `?api_key=${API_KEY}&language=${LANGUAGE}`;
 
   const datos = await hacerPeticion(url);
 
   const mapa = {};
-
-  datos.genres.forEach((g) => {
-    mapa[g.id] = g.name;
-  });
+  datos.genres.forEach((g) => (mapa[g.id] = g.name));
 
   return mapa;
 }
 
-// Obtener tendencias
-async function obtenerTrending(tipo) {
-  const url =
-    `https://api.themoviedb.org/3/trending/${tipo}/week` +
-    `?api_key=${API_KEY}` +
-    `&language=${LANGUAGE}`;
-
-  const datos = await hacerPeticion(url);
-
-  return datos.results || [];
-}
-
-// Obtener contenido plataforma
+// Contenido por plataforma
 async function obtenerContenido(tipo, providerId) {
   let url =
     `https://api.themoviedb.org/3/discover/${tipo}` +
@@ -137,13 +92,10 @@ async function obtenerContenido(tipo, providerId) {
     `&sort_by=popularity.desc` +
     `&page=1`;
 
-  // Fechas
   if (tipo === 'movie') {
-    url +=
-      `&primary_release_date.gte=${FECHA_SEMANA}`;
+    url += `&primary_release_date.gte=${FECHA_SEMANA}`;
   } else {
-    url +=
-      `&first_air_date.gte=${FECHA_SEMANA}`;
+    url += `&first_air_date.gte=${FECHA_SEMANA}`;
   }
 
   return hacerPeticion(url);
@@ -151,82 +103,22 @@ async function obtenerContenido(tipo, providerId) {
 
 async function main() {
   try {
-    if (!API_KEY) {
-      throw new Error(
-        'TMDB_API_KEY no encontrada'
-      );
-    }
+    if (!API_KEY) throw new Error('TMDB_API_KEY no encontrada');
 
-    console.log('Obteniendo géneros...');
-
-    const movieGenres = await obtenerGeneros(
-      'movie'
-    );
-
+    const movieGenres = await obtenerGeneros('movie');
     const tvGenres = await obtenerGeneros('tv');
-
-    console.log('Obteniendo tendencias...');
-
-    const trendingMovies =
-      await obtenerTrending('movie');
-
-    const trendingTV =
-      await obtenerTrending('tv');
 
     const resultado = {
       updated_at: new Date().toISOString(),
       region: REGION,
-      platforms: {},
-      trending: {
-        movies: [],
-        series: []
-      }
+      platforms: {}
     };
 
-    // Trending películas
-    for (const item of trendingMovies.slice(0, 10)) {
-      resultado.trending.movies.push({
-        id: item.id,
-        title: item.title,
-        poster_path: item.poster_path,
-        backdrop_path: item.backdrop_path,
-        vote_average: item.vote_average,
-        popularity: item.popularity
-      });
-    }
-
-    // Trending series
-    for (const item of trendingTV.slice(0, 10)) {
-      resultado.trending.series.push({
-        id: item.id,
-        title: item.name,
-        poster_path: item.poster_path,
-        backdrop_path: item.backdrop_path,
-        vote_average: item.vote_average,
-        popularity: item.popularity
-      });
-    }
-
-    // Plataformas
     for (const providerId in PLATAFORMAS) {
-      const plataforma =
-        PLATAFORMAS[providerId];
+      const plataforma = PLATAFORMAS[providerId];
 
-      console.log(
-        `Consultando ${plataforma.name}...`
-      );
-
-      const peliculas =
-        await obtenerContenido(
-          'movie',
-          providerId
-        );
-
-      const series =
-        await obtenerContenido(
-          'tv',
-          providerId
-        );
+      const peliculas = await obtenerContenido('movie', providerId);
+      const series = await obtenerContenido('tv', providerId);
 
       resultado.platforms[plataforma.name] = {
         logo: plataforma.logo,
@@ -234,102 +126,67 @@ async function main() {
         series: []
       };
 
-      // Procesar películas
+      // Movies
       for (const item of peliculas.results || []) {
-        const trailer =
-          await obtenerTrailer(
-            item.id,
-            'movie'
-          );
+        const trailer = await obtenerTrailer(item.id, 'movie');
 
-        resultado.platforms[
-          plataforma.name
-        ].movies.push({
+        resultado.platforms[plataforma.name].movies.push({
           id: item.id,
           type: 'movie',
           title: item.title,
           overview: item.overview,
           poster_path: item.poster_path,
-          backdrop_path:
-            item.backdrop_path,
-          release_date:
-            item.release_date,
-          vote_average:
-            item.vote_average,
+          backdrop_path: item.backdrop_path,
+          release_date: item.release_date,
+          vote_average: item.vote_average,
           popularity: item.popularity,
-          genres: item.genre_ids.map(
-            (id) => movieGenres[id]
-          ),
+          genres: item.genre_ids.map((id) => movieGenres[id]),
           trailer,
-          tmdb_url:
-            `https://www.themoviedb.org/movie/${item.id}`
+          tmdb_url: `https://www.themoviedb.org/movie/${item.id}`
         });
       }
 
-      // Procesar series
+      // Series
       for (const item of series.results || []) {
-        const trailer =
-          await obtenerTrailer(
-            item.id,
-            'tv'
-          );
+        const trailer = await obtenerTrailer(item.id, 'tv');
 
-        resultado.platforms[
-          plataforma.name
-        ].series.push({
+        resultado.platforms[plataforma.name].series.push({
           id: item.id,
           type: 'tv',
           title: item.name,
           overview: item.overview,
           poster_path: item.poster_path,
-          backdrop_path:
-            item.backdrop_path,
-          release_date:
-            item.first_air_date,
-          vote_average:
-            item.vote_average,
+          backdrop_path: item.backdrop_path,
+          release_date: item.first_air_date,
+          vote_average: item.vote_average,
           popularity: item.popularity,
-          genres: item.genre_ids.map(
-            (id) => tvGenres[id]
-          ),
+          genres: item.genre_ids.map((id) => tvGenres[id]),
           trailer,
-          tmdb_url:
-            `https://www.themoviedb.org/tv/${item.id}`
+          tmdb_url: `https://www.themoviedb.org/tv/${item.id}`
         });
       }
     }
 
-    // Crear carpeta
+    // 📍 NUEVA RUTA (IMPORTANTE)
     const rutaArchivo = path.join(
       __dirname,
-      '../data/estrenos.json'
+      '../frontend/public/estrenos.json'
     );
 
-    if (!fs.existsSync(path.dirname(rutaArchivo))) {
-      fs.mkdirSync(
-        path.dirname(rutaArchivo),
-        {
-          recursive: true
-        }
-      );
+    // crear carpeta si no existe
+    const dir = path.dirname(rutaArchivo);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
     }
 
-    // Guardar JSON
     fs.writeFileSync(
       rutaArchivo,
       JSON.stringify(resultado, null, 2)
     );
 
-    console.log(
-      '✅ Catálogo completo actualizado correctamente'
-    );
+    console.log('✅ Estrenos actualizados correctamente');
   } catch (error) {
-    console.error(
-      '\n❌ ERROR CRÍTICO:'
-    );
-
-    console.error(error.message);
-
+    console.error('❌ ERROR:', error.message);
     process.exit(1);
   }
 }
