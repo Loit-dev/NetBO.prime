@@ -1,40 +1,42 @@
-name: Actualización Automática de Catálogo
+name: Actualización catálogo
 
 on:
   schedule:
-    - cron: '0 0 * * *'
+    - cron: "0 0 * * *"
   workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
-  actualizar-datos:
+  update:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Clonar el repositorio
+      - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Instalar Node.js
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 22
 
-      - name: Ejecutar Script de Actualización
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run script
         run: node scripts/obtenerEstrenos.js
         env:
           TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
 
-      - name: Guardar y subir cambios a GitHub
+      - name: Commit changes
         run: |
           git config --global user.name "Streaming Bot"
-          git config --global user.email "bot@tusitio.com"
+          git config --global user.email "bot@streaming.com"
 
           git add frontend/public/estrenos.json
 
           git diff --cached --quiet && echo "Sin cambios" && exit 0
 
-          git commit -m "Actualización automática de estrenos"
-
+          git commit -m "update estrenos"
           git push
