@@ -2,7 +2,6 @@ const fs = require('fs');
 const path = require('path');
 const https = require('https');
 
-// Usamos la clave API corta
 const API_KEY = process.env.TMDB_API_KEY ? process.env.TMDB_API_KEY.trim() : ''; 
 const REGION = 'ES'; 
 
@@ -13,7 +12,6 @@ const PLATAFORMAS = {
   384: 'HBO Max / Max'
 };
 
-// Función auxiliar para hacer peticiones HTTPS robustas sin usar 'fetch'
 function hacerPeticion(url) {
   return new Promise((resolve, reject) => {
     https.get(url, {
@@ -45,7 +43,9 @@ async function consultarEstrenos() {
     }
 
     const listaFinal = [];
-    const urlPeliculas = `https://themoviedb.org{API_KEY}&language=es-ES&page=1&region=${REGION}`;
+    
+    // URL limpia y corregida paso a paso para evitar errores de sintaxis
+    const urlPeliculas = 'https://themoviedb.org' + API_KEY + '&language=es-ES&page=1&region=' + REGION;
     
     console.log('Conectando con la API de TMDB mediante HTTPS nativo...');
     const datos = await hacerPeticion(urlPeliculas);
@@ -54,11 +54,11 @@ async function consultarEstrenos() {
       throw new Error('La respuesta vino vacía.');
     }
 
-    console.log(`Buscando proveedores para ${datos.results.length} películas...`);
+    console.log('Buscando proveedores para los títulos encontrados...');
 
     for (const pelicula of datos.results) {
       try {
-        const providersUrl = `https://themoviedb.org{pelicula.id}/watch/providers?api_key=${API_KEY}`;
+        const providersUrl = 'https://themoviedb.org' + pelicula.id + '/watch/providers?api_key=' + API_KEY;
         const providersDatos = await hacerPeticion(providersUrl);
         const paisDatos = providersDatos.results ? providersDatos.results[REGION] : null;
         
@@ -88,7 +88,7 @@ async function consultarEstrenos() {
     }
 
     fs.writeFileSync(rutaArchivo, JSON.stringify(listaFinal, null, 2));
-    console.log(`¡Éxito total! Sincronizados de forma correcta ${listaFinal.length} estrenos.`);
+    console.log('¡Éxito total! Sincronizados de forma correcta ' + listaFinal.length + ' estrenos.');
 
   } catch (error) {
     console.error('\n❌ ERROR CRÍTICO DETECTADO:');
@@ -98,4 +98,3 @@ async function consultarEstrenos() {
 }
 
 consultarEstrenos();
-
