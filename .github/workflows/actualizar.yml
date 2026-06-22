@@ -12,24 +12,26 @@ jobs:
   update:
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: frontend
-
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+
+      - name: Ver estructura (debug)
+        run: ls -R
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 22
 
-      - name: Install dependencies
-        run: npm install
+      - name: Install dependencies (frontend)
+        run: |
+          cd frontend
+          npm install
 
       - name: Run script
-        run: node ../scripts/obtenerEstrenos.js
+        run: |
+          node scripts/obtenerEstrenos.js
         env:
           TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
 
@@ -38,7 +40,7 @@ jobs:
           git config --global user.name "Streaming Bot"
           git config --global user.email "bot@streaming.com"
 
-          git add public/estrenos.json
+          git add frontend/public/estrenos.json
 
           git diff --cached --quiet && echo "Sin cambios" && exit 0
 
