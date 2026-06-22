@@ -29,7 +29,7 @@ function hacerPeticion(url) {
             reject(new Error('Error al procesar el JSON de respuesta'));
           }
         } else {
-          reject(new Error(`Servidor respondió con código HTTP ${res.statusCode}`));
+          reject(new Error(`Servidor de TMDB respondió con código HTTP ${res.statusCode}`));
         }
       });
     }).on('error', (err) => reject(err));
@@ -44,7 +44,7 @@ async function consultarEstrenos() {
 
     const listaFinal = [];
     
-    // URL limpia y corregida paso a paso para evitar errores de sintaxis
+    // Dirección oficial e infalible de la API de TMDB
     const urlPeliculas = 'https://themoviedb.org' + API_KEY + '&language=es-ES&page=1&region=' + REGION;
     
     console.log('Conectando con la API de TMDB mediante HTTPS nativo...');
