@@ -7,6 +7,14 @@ const API_KEY = process.env.TMDB_API_KEY?.trim();
 const REGION = "ES";
 const LANGUAGE = "es-ES";
 
+/* 🧠 PLATAFORMAS */
+const PLATFORMS = {
+  8: "Netflix",
+  337: "Disney Plus",
+  119: "Amazon Prime Video",
+  384: "Max",
+};
+
 function request(url) {
   return new Promise((resolve, reject) => {
     https
@@ -19,52 +27,30 @@ function request(url) {
   });
 }
 
-async function get(url) {
+/* 🎯 FETCH PROVIDER DATA (CLAVE JUSTWATCH) */
+async function getWithProviders(type, providerId) {
+  const url =
+    `https://api.themoviedb.org/3/discover/${type}` +
+    `?api_key=${API_KEY}` +
+    `&language=${LANGUAGE}` +
+    `&sort_by=popularity.desc` +
+    `&with_watch_providers=${providerId}` +
+    `&watch_region=${REGION}` +
+    `&include_adult=false` +
+    `&page=1`;
+
   const data = await request(url);
   return data.results || [];
 }
 
-/* 🎬 MOVIES (SOLO STREAMING LOGIC) */
-async function getMovies() {
-  const trending = await get(
-    `https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}&language=${LANGUAGE}`
-  );
+/* 🔥 TRENDING GLOBAL */
+async function trending(type) {
+  const url =
+    `https://api.themoviedb.org/3/trending/${type}/week` +
+    `?api_key=${API_KEY}&language=${LANGUAGE}`;
 
-  const upcoming = await get(
-    `https://api.themoviedb.org/3/movie/upcoming?api_key=${API_KEY}&language=${LANGUAGE}&region=${REGION}`
-  );
-
-  const discover = await get(
-    `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=${LANGUAGE}&sort_by=popularity.desc&page=1`
-  );
-
-  /* filtrado básico: quitar cosas sin poster o rarezas */
-  return [...trending, ...upcoming, ...discover].filter(
-    (m) => m.poster_path && m.vote_average > 5
-  );
-}
-
-/* 📺 SERIES (FOCO REAL STREAMING) */
-async function getSeries() {
-  const trending = await get(
-    `https://api.themoviedb.org/3/trending/tv/week?api_key=${API_KEY}&language=${LANGUAGE}`
-  );
-
-  const airingToday = await get(
-    `https://api.themoviedb.org/3/tv/airing_today?api_key=${API_KEY}&language=${LANGUAGE}&region=${REGION}`
-  );
-
-  const onTheAir = await get(
-    `https://api.themoviedb.org/3/tv/on_the_air?api_key=${API_KEY}&language=${LANGUAGE}&region=${REGION}`
-  );
-
-  const discover = await get(
-    `https://api.themoviedb.org/3/discover/tv?api_key=${API_KEY}&language=${LANGUAGE}&sort_by=popularity.desc&page=1`
-  );
-
-  return [...trending, ...airingToday, ...onTheAir, ...discover].filter(
-    (s) => s.poster_path && s.vote_average > 5
-  );
+  const data = await request(url);
+  return data.results || [];
 }
 
 /* 🧠 DEDUPE */
@@ -74,18 +60,54 @@ function dedupe(list) {
   return Array.from(map.values());
 }
 
+/* 🎬 BUILD PLATFORM */
+async function buildPlatform(providerId, name, logo) {
+  const movies = await getWithProviders("movie", providerId);
+  const series = await getWithProviders("tv", providerId);
+
+  return {
+    name,
+    logo,
+    movies: movies.slice(0, 50),
+    series: series.slice(0, 50),
+  };
+}
+
 async function main() {
   if (!API_KEY) throw new Error("Missing API KEY");
 
-  const movies = dedupe(await getMovies()).slice(0, 120);
-  const series = dedupe(await getSeries()).slice(0, 120);
+  console.log("🚀 Generando catálogo JustWatch-like...");
+
+  const trendingMovies = await trending("movie");
+  const trendingSeries = await trending("tv");
+
+  const platforms = {};
+
+  for (const id in PLATFORMS) {
+    const name = PLATFORMS[id];
+
+    console.log("📡 Procesando:", name);
+
+    const data = await buildPlatform(
+      id,
+      name,
+      `/logos/${name.toLowerCase().replace(" ", "")}.png`
+    );
+
+    platforms[name] = data;
+  }
 
   const output = {
     updated_at: new Date().toISOString(),
-    region: REGION,
-    language: LANGUAGE,
-    movies,
-    series,
+
+    /* 🔥 CAPA GLOBAL (tipo JustWatch trending) */
+    trending: {
+      movies: dedupe(trendingMovies).slice(0, 30),
+      series: dedupe(trendingSeries).slice(0, 30),
+    },
+
+    /* 📺 CAPA POR PLATAFORMA */
+    platforms,
   };
 
   const file = path.join(__dirname, "../frontend/public/estrenos.json");
@@ -94,7 +116,7 @@ async function main() {
 
   fs.writeFileSync(file, JSON.stringify(output, null, 2));
 
-  console.log("✅ catálogo streaming-only actualizado");
+  console.log("✅ JustWatch MVP listo");
 }
 
 main();
