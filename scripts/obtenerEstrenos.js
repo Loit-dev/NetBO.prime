@@ -7,17 +7,14 @@ const API_KEY = process.env.TMDB_API_KEY?.trim();
 const REGION = "ES";
 const LANGUAGE = "es-ES";
 
-if (!API_KEY) {
-  throw new Error("TMDB_API_KEY no encontrada");
-}
-
+/* -------------------- REQUEST -------------------- */
 function request(url) {
   return new Promise((resolve, reject) => {
     https
       .get(url, (res) => {
         let data = "";
 
-        res.on("data", (chunk) => (data += chunk));
+        res.on("data", (c) => (data += c));
 
         res.on("end", () => {
           try {
@@ -31,12 +28,7 @@ function request(url) {
   });
 }
 
-async function get(url) {
-  const res = await request(url);
-  return res.results || [];
-}
-
-/* 🧠 CLASIFICACIÓN */
+/* -------------------- CLASSIFY -------------------- */
 function classify(item) {
   const dateStr = item.release_date || item.first_air_date;
   if (!dateStr) return "normal";
@@ -53,7 +45,7 @@ function classify(item) {
   return "old";
 }
 
-/* 📊 SCORE TIMELINE */
+/* -------------------- SCORE TIMELINE -------------------- */
 function score(item) {
   const dateStr = item.release_date || item.first_air_date;
   if (!dateStr) return 9999;
@@ -70,21 +62,21 @@ function score(item) {
   return 9999;
 }
 
-/* 🎬 MOVIES */
+/* -------------------- MOVIES (STREAMING ONLY) -------------------- */
 async function getMovies() {
-  const trending = await get(
-    `https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}&language=${LANGUAGE}`
-  );
+  const url =
+    `https://api.themoviedb.org/3/discover/movie` +
+    `?api_key=${API_KEY}` +
+    `&language=${LANGUAGE}` +
+    `&sort_by=release_date.desc` +
+    `&watch_region=${REGION}` +
+    `&with_watch_monetization_types=flatrate` +
+    `&with_watch_providers=8|337|119|384`;
 
-  const upcoming = await get(
-    `https://api.themoviedb.org/3/movie/upcoming?api_key=${API_KEY}&language=${LANGUAGE}&region=${REGION}`
-  );
+  const data = await request(url);
+  const results = data.results || [];
 
-  const discover = await get(
-    `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=${LANGUAGE}&sort_by=release_date.desc&page=1`
-  );
-
-  return [...trending, ...upcoming, ...discover]
+  return results
     .filter((m) => m.poster_path)
     .map((m) => ({
       ...m,
@@ -95,25 +87,21 @@ async function getMovies() {
     .sort((a, b) => score(a) - score(b));
 }
 
-/* 📺 SERIES */
+/* -------------------- SERIES (STREAMING ONLY) -------------------- */
 async function getSeries() {
-  const trending = await get(
-    `https://api.themoviedb.org/3/trending/tv/week?api_key=${API_KEY}&language=${LANGUAGE}`
-  );
+  const url =
+    `https://api.themoviedb.org/3/discover/tv` +
+    `?api_key=${API_KEY}` +
+    `&language=${LANGUAGE}` +
+    `&sort_by=first_air_date.desc` +
+    `&watch_region=${REGION}` +
+    `&with_watch_monetization_types=flatrate` +
+    `&with_watch_providers=8|337|119|384`;
 
-  const airing = await get(
-    `https://api.themoviedb.org/3/tv/airing_today?api_key=${API_KEY}&language=${LANGUAGE}&region=${REGION}`
-  );
+  const data = await request(url);
+  const results = data.results || [];
 
-  const onair = await get(
-    `https://api.themoviedb.org/3/tv/on_the_air?api_key=${API_KEY}&language=${LANGUAGE}&region=${REGION}`
-  );
-
-  const discover = await get(
-    `https://api.themoviedb.org/3/discover/tv?api_key=${API_KEY}&language=${LANGUAGE}&sort_by=first_air_date.desc&page=1`
-  );
-
-  return [...trending, ...airing, ...onair, ...discover]
+  return results
     .filter((s) => s.poster_path)
     .map((s) => ({
       ...s,
@@ -124,13 +112,17 @@ async function getSeries() {
     .sort((a, b) => score(a) - score(b));
 }
 
+/* -------------------- REMOVE DUPLICATES -------------------- */
 function dedupe(arr) {
   const map = new Map();
-  arr.forEach((i) => map.set(i.id, i));
+  arr.forEach((i) => i?.id && map.set(i.id, i));
   return [...map.values()];
 }
 
+/* -------------------- MAIN -------------------- */
 async function main() {
+  if (!API_KEY) throw new Error("Missing TMDB API KEY");
+
   const movies = dedupe(await getMovies()).slice(0, 80);
   const series = dedupe(await getSeries()).slice(0, 80);
 
@@ -140,14 +132,13 @@ async function main() {
     series,
   };
 
-  /* ✅ RUTA FIJA Y ROBUSTA */
   const file = path.resolve(process.cwd(), "frontend/public/estrenos.json");
 
   fs.mkdirSync(path.dirname(file), { recursive: true });
 
   fs.writeFileSync(file, JSON.stringify(output, null, 2));
 
-  console.log("✅ estrenos.json actualizado correctamente");
+  console.log("✅ SOLO STREAMING REAL (sin cine) actualizado");
 }
 
 main().catch((err) => {
