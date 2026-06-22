@@ -15,14 +15,21 @@ const PLATAFORMAS = {
   384: { name: 'Max', logo: '/logos/max.png' }
 };
 
-// Fecha últimos 7 días
-function obtenerFechaSemana() {
-  const fecha = new Date();
-  fecha.setDate(fecha.getDate() - 7);
-  return fecha.toISOString().split('T')[0];
+// 📅 Fechas (MES + SEMANA)
+function obtenerFechas() {
+  const hoy = new Date();
+
+  const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+  const hace7dias = new Date();
+  hace7dias.setDate(hoy.getDate() - 7);
+
+  return {
+    inicioMes: inicioMes.toISOString().split('T')[0],
+    hace7dias: hace7dias.toISOString().split('T')[0],
+  };
 }
 
-const FECHA_SEMANA = obtenerFechaSemana();
+const { inicioMes, hace7dias } = obtenerFechas();
 
 // HTTPS request
 function hacerPeticion(url) {
@@ -92,10 +99,11 @@ async function obtenerContenido(tipo, providerId) {
     `&sort_by=popularity.desc` +
     `&page=1`;
 
+  // 📅 MES COMPLETO
   if (tipo === 'movie') {
-    url += `&primary_release_date.gte=${FECHA_SEMANA}`;
+    url += `&primary_release_date.gte=${inicioMes}`;
   } else {
-    url += `&first_air_date.gte=${FECHA_SEMANA}`;
+    url += `&first_air_date.gte=${inicioMes}`;
   }
 
   return hacerPeticion(url);
@@ -126,7 +134,7 @@ async function main() {
         series: []
       };
 
-      // Movies
+      // 🎬 MOVIES
       for (const item of peliculas.results || []) {
         const trailer = await obtenerTrailer(item.id, 'movie');
 
@@ -142,11 +150,15 @@ async function main() {
           popularity: item.popularity,
           genres: item.genre_ids.map((id) => movieGenres[id]),
           trailer,
-          tmdb_url: `https://www.themoviedb.org/movie/${item.id}`
+          tmdb_url: `https://www.themoviedb.org/movie/${item.id}`,
+
+          // 🆕 FLAG NEW (últimos 7 días)
+          isNew:
+            new Date(item.release_date) >= new Date(hace7dias)
         });
       }
 
-      // Series
+      // 📺 SERIES
       for (const item of series.results || []) {
         const trailer = await obtenerTrailer(item.id, 'tv');
 
@@ -162,18 +174,20 @@ async function main() {
           popularity: item.popularity,
           genres: item.genre_ids.map((id) => tvGenres[id]),
           trailer,
-          tmdb_url: `https://www.themoviedb.org/tv/${item.id}`
+          tmdb_url: `https://www.themoviedb.org/tv/${item.id}`,
+
+          // 🆕 FLAG NEW
+          isNew:
+            new Date(item.first_air_date) >= new Date(hace7dias)
         });
       }
     }
 
-    // 📍 NUEVA RUTA (IMPORTANTE)
     const rutaArchivo = path.join(
       __dirname,
       '../frontend/public/estrenos.json'
     );
 
-    // crear carpeta si no existe
     const dir = path.dirname(rutaArchivo);
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
@@ -184,7 +198,7 @@ async function main() {
       JSON.stringify(resultado, null, 2)
     );
 
-    console.log('✅ Estrenos actualizados correctamente');
+    console.log('✅ Catálogo mensual actualizado correctamente');
   } catch (error) {
     console.error('❌ ERROR:', error.message);
     process.exit(1);
