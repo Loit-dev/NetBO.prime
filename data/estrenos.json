@@ -1,144 +1,403 @@
 {
-  "Netflix": {
+  "updated_at": "2026-06-22T14:47:56.877Z",
+  "region": "ES",
+  "platforms": {
+    "Netflix": {
+      "logo": "/logos/netflix.png",
+      "movies": [
+        {
+          "id": 614945,
+          "type": "movie",
+          "title": "Mensajes de voz para Isabelle",
+          "overview": "Una joven deja mensajes de voz bastante explícitos a su difunta hermana, sin saber que los recibe un desconocido que comienza a enamorarse de ella.",
+          "poster_path": "/3nY9BG8VjuxwLLRx5BGiiuj0M71.jpg",
+          "backdrop_path": "/2WU6Y6aonzD6uAaCmNnEFlesxxJ.jpg",
+          "release_date": "2026-06-20",
+          "vote_average": 7.672,
+          "popularity": 129.88,
+          "genres": [
+            "Romance",
+            "Comedia"
+          ],
+          "trailer": null,
+          "tmdb_url": "https://www.themoviedb.org/movie/614945"
+        },
+        {
+          "id": 1451344,
+          "type": "movie",
+          "title": "Maridos en acción",
+          "overview": "Un detective se une al nuevo marido de su exmujer para buscar a los que la han secuestrado. ¿Podrán dejar a un lado sus diferencias y llevar a cabo este rescate trepidante?",
+          "poster_path": "/12TfQSbwyb3t9PN0KTOTE4NB7lq.jpg",
+          "backdrop_path": "/zZQQ5dd7jq1PfUnWTT9qH4RMf5a.jpg",
+          "release_date": "2026-06-18",
+          "vote_average": 6.737,
+          "popularity": 121.4054,
+          "genres": [
+            "Comedia",
+            "Acción"
+          ],
+          "trailer": null,
+          "tmdb_url": "https://www.themoviedb.org/movie/1451344"
+        },
+        {
+          "id": 1702960,
+          "type": "movie",
+          "title": "GOAT Pandemonium Ge on all tempo",
+          "overview": "",
+          "poster_path": "/aeSAvkv3xsLYJd7w07wZiBq0GKu.jpg",
+          "backdrop_path": "/EokTYzRRRuICYnIJ6n8qHYWWMM.jpg",
+          "release_date": "2026-06-18",
+          "vote_average": 0,
+          "popularity": 1.7373,
+          "genres": [
+            "Comedia"
+          ],
+          "trailer": null,
+          "tmdb_url": "https://www.themoviedb.org/movie/1702960"
+        }
+      ],
+      "series": [
+        {
+          "id": 278178,
+          "type": "tv",
+          "title": "Te encontraré",
+          "overview": "Un hombre injustamente encarcelado por asesinar a su propio hijo emprende una desesperada misión de rescate tras descubrir que el niño podría estar vivo.",
+          "poster_path": "/yvZlBI21f8CqRiqVfTjMDPK1NYk.jpg",
+          "backdrop_path": "/2yDDwP48GqL9Fpb6UEgGHyqM63y.jpg",
+          "release_date": "2026-06-18",
+          "vote_average": 8.629,
+          "popularity": 176.8475,
+          "genres": [
+            "Drama",
+            "Misterio",
+            "Crimen"
+          ],
+          "trailer": "https://www.youtube.com/watch?v=ioo0mj1zUAQ",
+          "tmdb_url": "https://www.themoviedb.org/tv/278178"
+        },
+        {
+          "id": 296285,
+          "type": "tv",
+          "title": "Oasis",
+          "overview": "Huéspedes y empleados son sospechosos por igual tras la desaparición de una joven en un resort de lujo, del que nadie puede salir ni entrar hasta que se resuelva el caso.",
+          "poster_path": "/vWBtcjETIUd45OoIULEqc6qZxM7.jpg",
+          "backdrop_path": "/n4B2dVVScH4L4Scvy7mTboYcfGQ.jpg",
+          "release_date": "2026-06-19",
+          "vote_average": 7.7,
+          "popularity": 63.017,
+          "genres": [
+            "Crimen",
+            "Misterio",
+            "Drama"
+          ],
+          "trailer": null,
+          "tmdb_url": "https://www.themoviedb.org/tv/296285"
+        },
+        {
+          "id": 296206,
+          "type": "tv",
+          "title": "Agente Kim reactivado",
+          "overview": "Un padre normal y corriente desempolva su talento como agente de operaciones encubiertas para dar con su hija desaparecida... pero atrae una atención indeseada.",
+          "poster_path": "/eKJNWq4akdrviR9qEF6xPhzKQU.jpg",
+          "backdrop_path": "/ag85RWGhenAV2bD1vuVCC0SaB7X.jpg",
+          "release_date": "2026-06-26",
+          "vote_average": 10,
+          "popularity": 5.8788,
+          "genres": [
+            "Action & Adventure",
+            "Crimen",
+            "Drama"
+          ],
+          "trailer": null,
+          "tmdb_url": "https://www.themoviedb.org/tv/296206"
+        },
+        {
+          "id": 323842,
+          "type": "tv",
+          "title": "The Root of the Game",
+          "overview": "",
+          "poster_path": "/hw1GzjpTcxhhgaI5Rd4s6EP3gbX.jpg",
+          "backdrop_path": "/r3CZgVHhSvaASQke88mTFhcW92c.jpg",
+          "release_date": "2026-06-20",
+          "vote_average": 0,
+          "popularity": 2.9521,
+          "genres": [
+            "Documental"
+          ],
+          "trailer": null,
+          "tmdb_url": "https://www.themoviedb.org/tv/323842"
+        }
+      ]
+    },
+    "Amazon Prime Video": {
+      "logo": "/logos/prime.png",
+      "movies": [
+        {
+          "id": 1477317,
+          "type": "movie",
+          "title": "Culpa tuya: Londres",
+          "overview": "Noah y Nick regresan más fuertes, unidos y enamorados que nunca. Pero a medida que la vida empieza a tirar de ellos en direcciones diferentes, su relación se enfrenta a su reto más difícil hasta la fecha. Noah se marcha a Oxford para proseguir sus estudios, mientras que Nick se ve consumido por las crecientes exigencias del trabajo. Cuando nuevas personas entran en sus vidas, despertando emociones inesperadas y celos persistentes, empiezan a formarse grietas. La confianza se pone a prueba, las pasiones se desatan y el vínculo que una vez creyeron irrompible empieza a tensarse. Ahora, en una encrucijada, Noah y Nick deben decidir: luchar por el amor que los unió... o arriesgarse a perderlo para siempre.",
+          "poster_path": "/oeOmayFaiGz6km5vShPpDBQnZf1.jpg",
+          "backdrop_path": "/wQOhbCP6H8bO5ddlXDZT207orew.jpg",
+          "release_date": "2026-06-17",
+          "vote_average": 7.567,
+          "popularity": 193.8964,
+          "genres": [
+            "Romance",
+            "Drama"
+          ],
+          "trailer": "https://www.youtube.com/watch?v=02c0Ay0HsTc",
+          "tmdb_url": "https://www.themoviedb.org/movie/1477317"
+        },
+        {
+          "id": 1703103,
+          "type": "movie",
+          "title": "Addicted to Change",
+          "overview": "",
+          "poster_path": "/7Eewbbdv7MRsV87jlRWvwp1EFFE.jpg",
+          "backdrop_path": "/ts3Q7z59RdDZpqsE7dvtgWszKkj.jpg",
+          "release_date": "2026-07-30",
+          "vote_average": 0,
+          "popularity": 0.4486,
+          "genres": [
+            "Acción",
+            "Drama",
+            "Ciencia ficción"
+          ],
+          "trailer": null,
+          "tmdb_url": "https://www.themoviedb.org/movie/1703103"
+        }
+      ],
+      "series": [
+        {
+          "id": 283502,
+          "type": "tv",
+          "title": "Las tres mellizas",
+          "overview": "",
+          "poster_path": "/5jwVRVIaG0QL03uuMChg7krYRJ5.jpg",
+          "backdrop_path": "/rn1zY5N9fiwokA7ldqMIC6b5qb4.jpg",
+          "release_date": "2027-01-01",
+          "vote_average": 0,
+          "popularity": 0.392,
+          "genres": [
+            "Animación",
+            "Kids",
+            "Action & Adventure"
+          ],
+          "trailer": null,
+          "tmdb_url": "https://www.themoviedb.org/tv/283502"
+        }
+      ]
+    },
+    "Disney Plus": {
+      "logo": "/logos/disney.png",
+      "movies": [
+        {
+          "id": 1715818,
+          "type": "movie",
+          "title": "A Spark Into A Flame: Hamilton & Hip Hop",
+          "overview": "",
+          "poster_path": "/lfFxXrQzZPY3LHkNhxwmGgTvWQj.jpg",
+          "backdrop_path": "/7dYBC45o5xXuVw96W8yNjxSb0ID.jpg",
+          "release_date": "2026-06-16",
+          "vote_average": 1,
+          "popularity": 0.7536,
+          "genres": [
+            "Documental"
+          ],
+          "trailer": null,
+          "tmdb_url": "https://www.themoviedb.org/movie/1715818"
+        }
+      ],
+      "series": [
+        {
+          "id": 325035,
+          "type": "tv",
+          "title": "King & Princeがまちあわせ in LA",
+          "overview": "",
+          "poster_path": "/ewDZMgoLYi7HrCYXKpqW7pH0w5v.jpg",
+          "backdrop_path": "/oj7DS6GWT2LYVz9JUs83YF7mPeO.jpg",
+          "release_date": "2026-06-17",
+          "vote_average": 0,
+          "popularity": 0.7873,
+          "genres": [
+            "Reality"
+          ],
+          "trailer": null,
+          "tmdb_url": "https://www.themoviedb.org/tv/325035"
+        }
+      ]
+    },
+    "Max": {
+      "logo": "/logos/max.png",
+      "movies": [],
+      "series": []
+    }
+  },
+  "trending": {
     "movies": [
+      {
+        "id": 1084244,
+        "title": "Toy Story 5",
+        "poster_path": "/1yF3AztF3rQ8MZ8En8974AWo5zZ.jpg",
+        "backdrop_path": "/4D1pdB27uph7J8HQzNf8QvvH9bn.jpg",
+        "vote_average": 7.5,
+        "popularity": 335.2611
+      },
+      {
+        "id": 1339713,
+        "title": "Obsesión",
+        "poster_path": "/ohi9xvbBUymM4SuIOSlt1xbLRQQ.jpg",
+        "backdrop_path": "/5lTZyuBTNOfawsfPT8Q0cIg6qAF.jpg",
+        "vote_average": 7.9,
+        "popularity": 558.8407
+      },
+      {
+        "id": 1083381,
+        "title": "Backrooms",
+        "poster_path": "/u3CfgxtnZRxbIm8JuVTzt3DXQhg.jpg",
+        "backdrop_path": "/oUozq2XHWifwAVOoS1qHU0qfXqM.jpg",
+        "vote_average": 6.879,
+        "popularity": 123.7138
+      },
       {
         "id": 614945,
         "title": "Mensajes de voz para Isabelle",
-        "overview": "Una joven deja mensajes de voz bastante explícitos a su difunta hermana, sin saber que los recibe un desconocido que comienza a enamorarse de ella.",
         "poster_path": "/3nY9BG8VjuxwLLRx5BGiiuj0M71.jpg",
         "backdrop_path": "/2WU6Y6aonzD6uAaCmNnEFlesxxJ.jpg",
-        "release_date": "2026-06-20",
-        "vote_average": 7.672,
+        "vote_average": 7.7,
         "popularity": 129.88
+      },
+      {
+        "id": 1318413,
+        "title": "Tiempo de victoria",
+        "poster_path": "/d0PeqfICHgKnQ2f8YxyRJAg62fK.jpg",
+        "backdrop_path": "/apfyLCPVFttB8oXcsLJ7q0NSFLx.jpg",
+        "vote_average": 7.6,
+        "popularity": 94.0893
+      },
+      {
+        "id": 936075,
+        "title": "Michael",
+        "poster_path": "/2uK36ujoDXOfNiJ5Yp3raVprB51.jpg",
+        "backdrop_path": "/ufSwlnECLoUbBjPrFqEQcWBzHwc.jpg",
+        "vote_average": 8.677,
+        "popularity": 417.9739
+      },
+      {
+        "id": 1275779,
+        "title": "El día de la revelación",
+        "poster_path": "/uGww4UrU3316Mld4p30dgdM09Du.jpg",
+        "backdrop_path": "/s6ly8laenkHWlIBRkLSfIuEMLC6.jpg",
+        "vote_average": 6.722,
+        "popularity": 201.4653
+      },
+      {
+        "id": 969681,
+        "title": "Spider-Man: Un nuevo día",
+        "poster_path": "/2OKQrD5Txku6o5JQmxXrUAGKrSt.jpg",
+        "backdrop_path": "/vjMvFSmGUxEtqVdaZgvFee9XkZl.jpg",
+        "vote_average": 0,
+        "popularity": 98.2215
       },
       {
         "id": 1451344,
         "title": "Maridos en acción",
-        "overview": "Un detective se une al nuevo marido de su exmujer para buscar a los que la han secuestrado. ¿Podrán dejar a un lado sus diferencias y llevar a cabo este rescate trepidante?",
         "poster_path": "/12TfQSbwyb3t9PN0KTOTE4NB7lq.jpg",
         "backdrop_path": "/zZQQ5dd7jq1PfUnWTT9qH4RMf5a.jpg",
-        "release_date": "2026-06-18",
         "vote_average": 6.737,
         "popularity": 121.4054
       },
       {
-        "id": 1702960,
-        "title": "GOAT Pandemonium Ge on all tempo",
-        "overview": "",
-        "poster_path": "/aeSAvkv3xsLYJd7w07wZiBq0GKu.jpg",
-        "backdrop_path": "/EokTYzRRRuICYnIJ6n8qHYWWMM.jpg",
-        "release_date": "2026-06-18",
-        "vote_average": 0,
-        "popularity": 1.7373
+        "id": 1477317,
+        "title": "Culpa tuya: Londres",
+        "poster_path": "/oeOmayFaiGz6km5vShPpDBQnZf1.jpg",
+        "backdrop_path": "/wQOhbCP6H8bO5ddlXDZT207orew.jpg",
+        "vote_average": 7.567,
+        "popularity": 193.8964
       }
     ],
     "series": [
       {
+        "id": 94997,
+        "title": "La casa del dragón",
+        "poster_path": "/8MaxftF69sEAAD5673vTjIl8yT3.jpg",
+        "backdrop_path": "/577eXC8wFQT0eUrJcgznSiFPRmk.jpg",
+        "vote_average": 8.3,
+        "popularity": 208.2609
+      },
+      {
+        "id": 124364,
+        "title": "FROM",
+        "poster_path": "/pRtJagIxpfODzzb0T0NAvZSzErC.jpg",
+        "backdrop_path": "/m7eiSGHFzr584zFmetGqkqaU6BN.jpg",
+        "vote_average": 8.5,
+        "popularity": 760.9208
+      },
+      {
         "id": 278178,
         "title": "Te encontraré",
-        "overview": "Un hombre injustamente encarcelado por asesinar a su propio hijo emprende una desesperada misión de rescate tras descubrir que el niño podría estar vivo.",
         "poster_path": "/yvZlBI21f8CqRiqVfTjMDPK1NYk.jpg",
         "backdrop_path": "/2yDDwP48GqL9Fpb6UEgGHyqM63y.jpg",
-        "release_date": "2026-06-18",
         "vote_average": 8.629,
         "popularity": 176.8475
       },
       {
-        "id": 296285,
-        "title": "Oasis",
-        "overview": "Huéspedes y empleados son sospechosos por igual tras la desaparición de una joven en un resort de lujo, del que nadie puede salir ni entrar hasta que se resuelva el caso.",
-        "poster_path": "/vWBtcjETIUd45OoIULEqc6qZxM7.jpg",
-        "backdrop_path": "/n4B2dVVScH4L4Scvy7mTboYcfGQ.jpg",
-        "release_date": "2026-06-19",
-        "vote_average": 7.7,
-        "popularity": 63.017
+        "id": 270476,
+        "title": "La maldición de Widow's Bay",
+        "poster_path": "/n019if9Ob29NLATYFLFSQNNWKJg.jpg",
+        "backdrop_path": "/u6XtMg9Ai9siEbEs0UudPS3EaZY.jpg",
+        "vote_average": 8.202,
+        "popularity": 95.5639
       },
       {
-        "id": 296206,
-        "title": "Agente Kim reactivado",
-        "overview": "Un padre normal y corriente desempolva su talento como agente de operaciones encubiertas para dar con su hija desaparecida... pero atrae una atención indeseada.",
-        "poster_path": "/eKJNWq4akdrviR9qEF6xPhzKQU.jpg",
-        "backdrop_path": "/ag85RWGhenAV2bD1vuVCC0SaB7X.jpg",
-        "release_date": "2026-06-26",
-        "vote_average": 10,
-        "popularity": 5.8788
+        "id": 276161,
+        "title": "Así aprenderás",
+        "poster_path": "/lG83nWVT7cHl3nSxonaYhOjqyWH.jpg",
+        "backdrop_path": "/fOV6dJGG6EghbeXkU7RVQpDhFyp.jpg",
+        "vote_average": 9.492,
+        "popularity": 190.2929
       },
       {
-        "id": 323842,
-        "title": "The Root of the Game",
-        "overview": "",
-        "poster_path": "/hw1GzjpTcxhhgaI5Rd4s6EP3gbX.jpg",
-        "backdrop_path": "/r3CZgVHhSvaASQke88mTFhcW92c.jpg",
-        "release_date": "2026-06-20",
-        "vote_average": 0,
-        "popularity": 2.9521
-      }
-    ]
-  },
-  "Amazon Prime Video": {
-    "movies": [
-      {
-        "id": 1477317,
-        "title": "Culpa tuya: Londres",
-        "overview": "Noah y Nick regresan más fuertes, unidos y enamorados que nunca. Pero a medida que la vida empieza a tirar de ellos en direcciones diferentes, su relación se enfrenta a su reto más difícil hasta la fecha. Noah se marcha a Oxford para proseguir sus estudios, mientras que Nick se ve consumido por las crecientes exigencias del trabajo. Cuando nuevas personas entran en sus vidas, despertando emociones inesperadas y celos persistentes, empiezan a formarse grietas. La confianza se pone a prueba, las pasiones se desatan y el vínculo que una vez creyeron irrompible empieza a tensarse. Ahora, en una encrucijada, Noah y Nick deben decidir: luchar por el amor que los unió... o arriesgarse a perderlo para siempre.",
-        "poster_path": "/oeOmayFaiGz6km5vShPpDBQnZf1.jpg",
-        "backdrop_path": "/wQOhbCP6H8bO5ddlXDZT207orew.jpg",
-        "release_date": "2026-06-17",
-        "vote_average": 7.567,
-        "popularity": 193.8964
+        "id": 219971,
+        "title": "La Agencia",
+        "poster_path": "/fWGQaZ9BntXIDT1WKHrbSAVuShk.jpg",
+        "backdrop_path": "/fNA0mMdHlRwVrQSRlYONmSAO8Su.jpg",
+        "vote_average": 7.1,
+        "popularity": 46.9299
       },
       {
-        "id": 1703103,
-        "title": "Addicted to Change",
-        "overview": "",
-        "poster_path": "/7Eewbbdv7MRsV87jlRWvwp1EFFE.jpg",
-        "backdrop_path": "/ts3Q7z59RdDZpqsE7dvtgWszKkj.jpg",
-        "release_date": "2026-07-30",
-        "vote_average": 0,
-        "popularity": 0.4486
-      }
-    ],
-    "series": [
+        "id": 65942,
+        "title": "Re:Zero - Empezar de cero en un mundo diferente",
+        "poster_path": "/ccG0ZfXOQ0834bIus4SwZrXtkyM.jpg",
+        "backdrop_path": "/x6y59dJBE1o0r4YRsWVQXE2nnlB.jpg",
+        "vote_average": 7.9,
+        "popularity": 96.8496
+      },
       {
-        "id": 283502,
-        "title": "Las tres mellizas",
-        "overview": "",
-        "poster_path": "/5jwVRVIaG0QL03uuMChg7krYRJ5.jpg",
-        "backdrop_path": "/rn1zY5N9fiwokA7ldqMIC6b5qb4.jpg",
-        "release_date": "2027-01-01",
-        "vote_average": 0,
-        "popularity": 0.392
+        "id": 220102,
+        "title": "Spider-Noir",
+        "poster_path": "/4Pec5a1At5UMeADkgcxwf6nLqau.jpg",
+        "backdrop_path": "/6t2FvBr9DS8MOq0m5FAwPBCdAW5.jpg",
+        "vote_average": 8.523,
+        "popularity": 97.191
+      },
+      {
+        "id": 60625,
+        "title": "Rick y Morty",
+        "poster_path": "/5Yiep9EwcQgLolg013ETBVqHxuD.jpg",
+        "backdrop_path": "/9In9QgVJx7PlFOAgVHCKKSbo605.jpg",
+        "vote_average": 8.679,
+        "popularity": 150.9789
+      },
+      {
+        "id": 37854,
+        "title": "One Piece",
+        "poster_path": "/frwoK0POcZ8wtW4Uu2pJLx1kpwp.jpg",
+        "backdrop_path": "/2rmK7mnchw9Xr3XdiTFSxTTLXqv.jpg",
+        "vote_average": 8.7,
+        "popularity": 49.8785
       }
     ]
-  },
-  "Disney Plus": {
-    "movies": [
-      {
-        "id": 1715818,
-        "title": "A Spark Into A Flame: Hamilton & Hip Hop",
-        "overview": "",
-        "poster_path": "/lfFxXrQzZPY3LHkNhxwmGgTvWQj.jpg",
-        "backdrop_path": "/7dYBC45o5xXuVw96W8yNjxSb0ID.jpg",
-        "release_date": "2026-06-16",
-        "vote_average": 1,
-        "popularity": 0.7536
-      }
-    ],
-    "series": [
-      {
-        "id": 325035,
-        "title": "King & Princeがまちあわせ in LA",
-        "overview": "",
-        "poster_path": "/ewDZMgoLYi7HrCYXKpqW7pH0w5v.jpg",
-        "backdrop_path": "/oj7DS6GWT2LYVz9JUs83YF7mPeO.jpg",
-        "release_date": "2026-06-17",
-        "vote_average": 0,
-        "popularity": 0.7873
-      }
-    ]
-  },
-  "Max": {
-    "movies": [],
-    "series": []
   }
 }
