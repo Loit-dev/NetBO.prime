@@ -7,7 +7,7 @@ const API_KEY = process.env.TMDB_API_KEY?.trim();
 const REGION = "ES";
 const LANGUAGE = "es-ES";
 
-/* -------------------- REQUEST -------------------- */
+/* ---------------- REQUEST ---------------- */
 function request(url) {
   return new Promise((resolve, reject) => {
     https
@@ -28,7 +28,7 @@ function request(url) {
   });
 }
 
-/* -------------------- CLASSIFY -------------------- */
+/* ---------------- STATUS LOGIC ---------------- */
 function classify(item) {
   const dateStr = item.release_date || item.first_air_date;
   if (!dateStr) return "normal";
@@ -40,12 +40,10 @@ function classify(item) {
 
   if (diffDays >= -7 && diffDays <= 7) return "recent";
   if (diffDays > 7) return "upcoming";
-  if (diffDays >= -30) return "normal";
-
-  return "old";
+  return "normal";
 }
 
-/* -------------------- SCORE TIMELINE -------------------- */
+/* ---------------- SCORE ---------------- */
 function score(item) {
   const dateStr = item.release_date || item.first_air_date;
   if (!dateStr) return 9999;
@@ -62,7 +60,10 @@ function score(item) {
   return 9999;
 }
 
-/* -------------------- MOVIES (STREAMING ONLY) -------------------- */
+/* ---------------- STREAMING FILTER ONLY ---------------- */
+const STREAM_PROVIDERS = "8|337|119|384";
+
+/* ---------------- MOVIES ---------------- */
 async function getMovies() {
   const url =
     `https://api.themoviedb.org/3/discover/movie` +
@@ -71,12 +72,11 @@ async function getMovies() {
     `&sort_by=release_date.desc` +
     `&watch_region=${REGION}` +
     `&with_watch_monetization_types=flatrate` +
-    `&with_watch_providers=8|337|119|384`;
+    `&with_watch_providers=${STREAM_PROVIDERS}`;
 
   const data = await request(url);
-  const results = data.results || [];
 
-  return results
+  return (data.results || [])
     .filter((m) => m.poster_path)
     .map((m) => ({
       ...m,
@@ -87,7 +87,7 @@ async function getMovies() {
     .sort((a, b) => score(a) - score(b));
 }
 
-/* -------------------- SERIES (STREAMING ONLY) -------------------- */
+/* ---------------- SERIES ---------------- */
 async function getSeries() {
   const url =
     `https://api.themoviedb.org/3/discover/tv` +
@@ -96,12 +96,11 @@ async function getSeries() {
     `&sort_by=first_air_date.desc` +
     `&watch_region=${REGION}` +
     `&with_watch_monetization_types=flatrate` +
-    `&with_watch_providers=8|337|119|384`;
+    `&with_watch_providers=${STREAM_PROVIDERS}`;
 
   const data = await request(url);
-  const results = data.results || [];
 
-  return results
+  return (data.results || [])
     .filter((s) => s.poster_path)
     .map((s) => ({
       ...s,
@@ -112,17 +111,15 @@ async function getSeries() {
     .sort((a, b) => score(a) - score(b));
 }
 
-/* -------------------- REMOVE DUPLICATES -------------------- */
+/* ---------------- REMOVE DUPLICATES ---------------- */
 function dedupe(arr) {
   const map = new Map();
-  arr.forEach((i) => i?.id && map.set(i.id, i));
+  arr.forEach((i) => map.set(i.id, i));
   return [...map.values()];
 }
 
-/* -------------------- MAIN -------------------- */
+/* ---------------- MAIN ---------------- */
 async function main() {
-  if (!API_KEY) throw new Error("Missing TMDB API KEY");
-
   const movies = dedupe(await getMovies()).slice(0, 80);
   const series = dedupe(await getSeries()).slice(0, 80);
 
@@ -138,10 +135,10 @@ async function main() {
 
   fs.writeFileSync(file, JSON.stringify(output, null, 2));
 
-  console.log("✅ SOLO STREAMING REAL (sin cine) actualizado");
+  console.log("✅ catálogo streaming + status OK");
 }
 
 main().catch((err) => {
-  console.error("❌ ERROR:", err);
+  console.error(err);
   process.exit(1);
 });
