@@ -26,21 +26,11 @@ function request(url) {
   });
 }
 
-/* 🔥 MÁS PÁGINAS = MÁS CONTENIDO */
-async function fetchDiscover(type, providerId) {
+async function fetchPages(urlBase, pages = 3) {
   let all = [];
 
-  for (let page = 1; page <= 5; page++) {
-    const url =
-      `https://api.themoviedb.org/3/discover/${type}` +
-      `?api_key=${API_KEY}` +
-      `&language=${LANGUAGE}` +
-      `&watch_region=${REGION}` +
-      `&with_watch_providers=${providerId}` +
-      `&sort_by=popularity.desc` +
-      `&include_adult=false` +
-      `&page=${page}`;
-
+  for (let page = 1; page <= pages; page++) {
+    const url = `${urlBase}&page=${page}`;
     const data = await request(url);
     all = all.concat(data.results || []);
   }
@@ -48,8 +38,8 @@ async function fetchDiscover(type, providerId) {
   return all;
 }
 
-/* 🔥 TRENDING EXTRA */
-async function fetchTrending(type) {
+/* 🔥 TRENDING */
+async function trending(type) {
   const url =
     `https://api.themoviedb.org/3/trending/${type}/week` +
     `?api_key=${API_KEY}&language=${LANGUAGE}`;
@@ -58,28 +48,47 @@ async function fetchTrending(type) {
   return data.results || [];
 }
 
+/* 🔥 UPCOMING (ESTRENOS REALES) */
+async function upcoming(type) {
+  const url =
+    `https://api.themoviedb.org/3/${type}/upcoming` +
+    `?api_key=${API_KEY}&language=${LANGUAGE}&region=${REGION}`;
+
+  const data = await request(url);
+  return data.results || [];
+}
+
+/* 🔥 DISCOVER SIN RESTRICCIÓN FUERTE */
+async function discover(type) {
+  const base =
+    `https://api.themoviedb.org/3/discover/${type}` +
+    `?api_key=${API_KEY}` +
+    `&language=${LANGUAGE}` +
+    `&sort_by=popularity.desc` +
+    `&include_adult=false`;
+
+  return fetchPages(base, 4);
+}
+
 /* 🔥 TRAILER */
-async function fetchTrailer(id, type) {
+async function trailer(id, type) {
   const url =
     `https://api.themoviedb.org/3/${type}/${id}/videos` +
     `?api_key=${API_KEY}&language=${LANGUAGE}`;
 
   const data = await request(url);
 
-  const trailer = (data.results || []).find(
+  const t = (data.results || []).find(
     (v) => v.site === "YouTube" && v.type === "Trailer"
   );
 
-  return trailer
-    ? {
-        youtubeId: trailer.key,
-      }
-    : null;
+  return t ? { youtubeId: t.key } : null;
 }
 
-function dedupe(list) {
+/* 🔥 MERGE */
+function merge(arrays) {
   const map = new Map();
-  list.forEach((i) => map.set(i.id, i));
+  arrays.flat().forEach((i) => map.set(i.id, i));
   return Array.from(map.values());
 }
 
@@ -92,16 +101,19 @@ async function main() {
   for (const id in PLATAFORMAS) {
     const p = PLATAFORMAS[id];
 
-    console.log("Procesando", p.name);
+    console.log("Procesando:", p.name);
 
-    const movies = await fetchDiscover("movie", id);
-    const series = await fetchDiscover("tv", id);
+    const movies = merge([
+      await trending("movie"),
+      await upcoming("movie"),
+      await discover("movie"),
+    ]);
 
-    const trendingMovies = await fetchTrending("movie");
-    const trendingSeries = await fetchTrending("tv");
-
-    const allMovies = dedupe([...trendingMovies, ...movies]).slice(0, 60);
-    const allSeries = dedupe([...trendingSeries, ...series]).slice(0, 60);
+    const series = merge([
+      await trending("tv"),
+      await upcoming("tv"),
+      await discover("tv"),
+    ]);
 
     output.platforms[p.name] = {
       logo: p.logo,
@@ -109,8 +121,8 @@ async function main() {
       series: [],
     };
 
-    for (const m of allMovies) {
-      const trailer = await fetchTrailer(m.id, "movie");
+    for (const m of movies.slice(0, 80)) {
+      const vid = await trailer(m.id, "movie");
 
       output.platforms[p.name].movies.push({
         id: m.id,
@@ -120,12 +132,12 @@ async function main() {
         backdrop_path: m.backdrop_path,
         vote_average: m.vote_average,
         popularity: m.popularity,
-        video: trailer,
+        video: vid,
       });
     }
 
-    for (const s of allSeries) {
-      const trailer = await fetchTrailer(s.id, "tv");
+    for (const s of series.slice(0, 80)) {
+      const vid = await trailer(s.id, "tv");
 
       output.platforms[p.name].series.push({
         id: s.id,
@@ -135,7 +147,7 @@ async function main() {
         backdrop_path: s.backdrop_path,
         vote_average: s.vote_average,
         popularity: s.popularity,
-        video: trailer,
+        video: vid,
       });
     }
   }
@@ -146,7 +158,7 @@ async function main() {
 
   fs.writeFileSync(file, JSON.stringify(output, null, 2));
 
-  console.log("✅ catálogo ampliado listo (mucho más contenido)");
+  console.log("✅ catálogo REAL ampliado (trending + upcoming + discover)");
 }
 
 main();
