@@ -1,4 +1,4 @@
-name: Actualización catálogo
+name: Actualizar catálogo
 
 on:
   schedule:
@@ -11,6 +11,10 @@ permissions:
 jobs:
   update:
     runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: frontend
 
     steps:
       - name: Checkout repo
@@ -25,7 +29,7 @@ jobs:
         run: npm install
 
       - name: Run script
-        run: node scripts/obtenerEstrenos.js
+        run: node ../scripts/obtenerEstrenos.js
         env:
           TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
 
@@ -34,7 +38,7 @@ jobs:
           git config --global user.name "Streaming Bot"
           git config --global user.email "bot@streaming.com"
 
-          git add frontend/public/estrenos.json
+          git add public/estrenos.json
 
           git diff --cached --quiet && echo "Sin cambios" && exit 0
 
