@@ -2,22 +2,29 @@ const fs = require('fs');
 const path = require('path');
 const https = require('https');
 
-// Lee la API KEY desde GitHub Secrets
-const API_KEY = process.env.TMDB_API_KEY
-  ? process.env.TMDB_API_KEY.trim()
-  : '';
+const API_KEY = process.env.TMDB_API_KEY?.trim();
 
 const REGION = 'ES';
 
-// IDs oficiales de proveedores en TMDB
+// Plataformas TMDB
 const PLATAFORMAS = {
   8: 'Netflix',
   337: 'Disney Plus',
   119: 'Amazon Prime Video',
-  384: 'HBO Max / Max'
+  384: 'Max'
 };
 
-// Función HTTPS segura
+// Obtener fecha hace 7 días
+function obtenerFechaSemana() {
+  const fecha = new Date();
+  fecha.setDate(fecha.getDate() - 7);
+
+  return fecha.toISOString().split('T')[0];
+}
+
+const FECHA_SEMANA = obtenerFechaSemana();
+
+// Función HTTPS
 function hacerPeticion(url) {
   return new Promise((resolve, reject) => {
     https
@@ -36,121 +43,113 @@ function hacerPeticion(url) {
           });
 
           res.on('end', () => {
-            if (res.statusCode >= 200 && res.statusCode < 300) {
-              try {
-                resolve(JSON.parse(data));
-              } catch (e) {
-                reject(
-                  new Error('Error al procesar el JSON de respuesta')
-                );
-              }
-            } else {
-              reject(
-                new Error(
-                  `Servidor TMDB respondió con HTTP ${res.statusCode}`
-                )
-              );
+            try {
+              resolve(JSON.parse(data));
+            } catch (err) {
+              reject(err);
             }
           });
         }
       )
-      .on('error', (err) => {
-        reject(err);
-      });
+      .on('error', reject);
   });
 }
 
-async function consultarEstrenos() {
+async function obtenerContenido(tipo, providerId) {
+  const url =
+    `https://api.themoviedb.org/3/discover/${tipo}` +
+    `?api_key=${API_KEY}` +
+    `&language=es-ES` +
+    `&watch_region=${REGION}` +
+    `&with_watch_providers=${providerId}` +
+    `&sort_by=popularity.desc` +
+    `&page=1`;
+
+  // Fechas
+  if (tipo === 'movie') {
+    return hacerPeticion(
+      url +
+        `&primary_release_date.gte=${FECHA_SEMANA}`
+    );
+  } else {
+    return hacerPeticion(
+      url +
+        `&first_air_date.gte=${FECHA_SEMANA}`
+    );
+  }
+}
+
+async function main() {
   try {
-    // Verifica API KEY
     if (!API_KEY) {
-      throw new Error(
-        'La clave TMDB_API_KEY está vacía en GitHub Secrets.'
+      throw new Error('TMDB_API_KEY no encontrada');
+    }
+
+    const resultado = {};
+
+    for (const providerId in PLATAFORMAS) {
+      const nombre = PLATAFORMAS[providerId];
+
+      console.log(`Consultando ${nombre}...`);
+
+      // Películas
+      const peliculas = await obtenerContenido(
+        'movie',
+        providerId
       );
+
+      // Series
+      const series = await obtenerContenido(
+        'tv',
+        providerId
+      );
+
+      resultado[nombre] = {
+        movies: peliculas.results.map((item) => ({
+          id: item.id,
+          title: item.title,
+          overview: item.overview,
+          poster_path: item.poster_path,
+          backdrop_path: item.backdrop_path,
+          release_date: item.release_date,
+          vote_average: item.vote_average,
+          popularity: item.popularity
+        })),
+
+        series: series.results.map((item) => ({
+          id: item.id,
+          title: item.name,
+          overview: item.overview,
+          poster_path: item.poster_path,
+          backdrop_path: item.backdrop_path,
+          release_date: item.first_air_date,
+          vote_average: item.vote_average,
+          popularity: item.popularity
+        }))
+      };
     }
 
-    const listaFinal = [];
-
-    // Endpoint oficial TMDB
-    const urlPeliculas =
-      `https://api.themoviedb.org/3/movie/now_playing?api_key=${API_KEY}&language=es-ES&page=1&region=${REGION}`;
-
-    console.log('Conectando con TMDB...');
-
-    const datos = await hacerPeticion(urlPeliculas);
-
-    if (!datos.results || datos.results.length === 0) {
-      throw new Error('TMDB devolvió una respuesta vacía.');
-    }
-
-    console.log('Buscando plataformas de streaming...');
-
-    // Recorremos películas
-    for (const pelicula of datos.results) {
-      try {
-        // Endpoint proveedores
-        const providersUrl =
-          `https://api.themoviedb.org/3/movie/${pelicula.id}/watch/providers?api_key=${API_KEY}`;
-
-        const providersDatos = await hacerPeticion(providersUrl);
-
-        const paisDatos = providersDatos.results
-          ? providersDatos.results[REGION]
-          : null;
-
-        // Si existe streaming por suscripción
-        if (paisDatos && paisDatos.flatrate) {
-          for (const proveedor of paisDatos.flatrate) {
-            if (PLATAFORMAS[proveedor.provider_id]) {
-              listaFinal.push({
-                id: pelicula.id,
-                title: pelicula.title,
-                overview: pelicula.overview,
-                poster_path: pelicula.poster_path,
-                release_date: pelicula.release_date,
-                plataforma: PLATAFORMAS[proveedor.provider_id]
-              });
-
-              // Ya encontramos plataforma
-              break;
-            }
-          }
-        }
-      } catch (err) {
-        console.log(
-          `Error consultando proveedores para película ${pelicula.id}`
-        );
-      }
-    }
-
-    // Guardar JSON
     const rutaArchivo = path.join(
       __dirname,
       '../data/estrenos.json'
     );
 
-    // Crear carpeta si no existe
     if (!fs.existsSync(path.dirname(rutaArchivo))) {
       fs.mkdirSync(path.dirname(rutaArchivo), {
         recursive: true
       });
     }
 
-    // Escribir archivo
     fs.writeFileSync(
       rutaArchivo,
-      JSON.stringify(listaFinal, null, 2)
+      JSON.stringify(resultado, null, 2)
     );
 
-    console.log(
-      `✅ Éxito: ${listaFinal.length} estrenos sincronizados correctamente.`
-    );
+    console.log('✅ Catálogo actualizado correctamente');
   } catch (error) {
-    console.error('\n❌ ERROR CRÍTICO DETECTADO:');
-    console.error(error.message);
+    console.error('❌ Error:', error.message);
     process.exit(1);
   }
 }
 
-// Ejecutar script
-consultarEstrenos();
+main();
