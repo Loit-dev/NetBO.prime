@@ -1,18 +1,144 @@
-[
-  {
-    "id": 808,
-    "title": "Shrek",
-    "overview": "Hace mucho, mucho tiempo, en una lejanísima ciénaga vivía un intratable ogro llamado Shrek. Pero de repente, un día, su absoluta soledad se ve interrumpida por una invasión de sorprendentes personajes de cuento. Hay ratoncitos ciegos en su comida, un enorme y malísimo lobo en su cama, tres cerditos sin hogar y otros muchos seres increíbles que han sido deportados de su reino por el malvado Lord Farquaad. Para conseguir salvar su terreno, y de paso a sí mismo, Shrek hace un pacto con Farquaad y emprende viaje para conseguir que la preciosa princesa Fiona sea la novia del Lord. En tan importante misión le acompañan un burro chistoso, dispuesto a hacer cualquier cosa por Shrek. Todo, menos estarse calladito. Rescatar a la princesa de una dragona enamoradiza que suelta fuego al respirar va a resultar una tontería comparado con lo que ocurre cuando el oscuro secreto que la joven guardaba es revelado.",
-    "poster_path": "/jTQONM7jt1yv2lL972TtmWO0UIZ.jpg",
-    "release_date": "2026-05-29",
-    "plataforma": "Amazon Prime Video"
+{
+  "Netflix": {
+    "movies": [
+      {
+        "id": 614945,
+        "title": "Mensajes de voz para Isabelle",
+        "overview": "Una joven deja mensajes de voz bastante explícitos a su difunta hermana, sin saber que los recibe un desconocido que comienza a enamorarse de ella.",
+        "poster_path": "/3nY9BG8VjuxwLLRx5BGiiuj0M71.jpg",
+        "backdrop_path": "/2WU6Y6aonzD6uAaCmNnEFlesxxJ.jpg",
+        "release_date": "2026-06-20",
+        "vote_average": 7.672,
+        "popularity": 129.88
+      },
+      {
+        "id": 1451344,
+        "title": "Maridos en acción",
+        "overview": "Un detective se une al nuevo marido de su exmujer para buscar a los que la han secuestrado. ¿Podrán dejar a un lado sus diferencias y llevar a cabo este rescate trepidante?",
+        "poster_path": "/12TfQSbwyb3t9PN0KTOTE4NB7lq.jpg",
+        "backdrop_path": "/zZQQ5dd7jq1PfUnWTT9qH4RMf5a.jpg",
+        "release_date": "2026-06-18",
+        "vote_average": 6.737,
+        "popularity": 121.4054
+      },
+      {
+        "id": 1702960,
+        "title": "GOAT Pandemonium Ge on all tempo",
+        "overview": "",
+        "poster_path": "/aeSAvkv3xsLYJd7w07wZiBq0GKu.jpg",
+        "backdrop_path": "/EokTYzRRRuICYnIJ6n8qHYWWMM.jpg",
+        "release_date": "2026-06-18",
+        "vote_average": 0,
+        "popularity": 1.7373
+      }
+    ],
+    "series": [
+      {
+        "id": 278178,
+        "title": "Te encontraré",
+        "overview": "Un hombre injustamente encarcelado por asesinar a su propio hijo emprende una desesperada misión de rescate tras descubrir que el niño podría estar vivo.",
+        "poster_path": "/yvZlBI21f8CqRiqVfTjMDPK1NYk.jpg",
+        "backdrop_path": "/2yDDwP48GqL9Fpb6UEgGHyqM63y.jpg",
+        "release_date": "2026-06-18",
+        "vote_average": 8.629,
+        "popularity": 176.8475
+      },
+      {
+        "id": 296285,
+        "title": "Oasis",
+        "overview": "Huéspedes y empleados son sospechosos por igual tras la desaparición de una joven en un resort de lujo, del que nadie puede salir ni entrar hasta que se resuelva el caso.",
+        "poster_path": "/vWBtcjETIUd45OoIULEqc6qZxM7.jpg",
+        "backdrop_path": "/n4B2dVVScH4L4Scvy7mTboYcfGQ.jpg",
+        "release_date": "2026-06-19",
+        "vote_average": 7.7,
+        "popularity": 63.017
+      },
+      {
+        "id": 296206,
+        "title": "Agente Kim reactivado",
+        "overview": "Un padre normal y corriente desempolva su talento como agente de operaciones encubiertas para dar con su hija desaparecida... pero atrae una atención indeseada.",
+        "poster_path": "/eKJNWq4akdrviR9qEF6xPhzKQU.jpg",
+        "backdrop_path": "/ag85RWGhenAV2bD1vuVCC0SaB7X.jpg",
+        "release_date": "2026-06-26",
+        "vote_average": 10,
+        "popularity": 5.8788
+      },
+      {
+        "id": 323842,
+        "title": "The Root of the Game",
+        "overview": "",
+        "poster_path": "/hw1GzjpTcxhhgaI5Rd4s6EP3gbX.jpg",
+        "backdrop_path": "/r3CZgVHhSvaASQke88mTFhcW92c.jpg",
+        "release_date": "2026-06-20",
+        "vote_average": 0,
+        "popularity": 2.9521
+      }
+    ]
   },
-  {
-    "id": 1552407,
-    "title": "Drea & Cloe",
-    "overview": "Dos ambiciosas mujeres, ambas directoras de orquesta, se encuentran en una mansión gótica y sienten una atracción mutua e inmediata. Pero esta se complica cuando descubren que son rivales por el mismo prestigioso puesto.",
-    "poster_path": "/i0CekRC1hE1qLTLhdVJlmI7nKpc.jpg",
-    "release_date": "2026-06-12",
-    "plataforma": "Amazon Prime Video"
+  "Amazon Prime Video": {
+    "movies": [
+      {
+        "id": 1477317,
+        "title": "Culpa tuya: Londres",
+        "overview": "Noah y Nick regresan más fuertes, unidos y enamorados que nunca. Pero a medida que la vida empieza a tirar de ellos en direcciones diferentes, su relación se enfrenta a su reto más difícil hasta la fecha. Noah se marcha a Oxford para proseguir sus estudios, mientras que Nick se ve consumido por las crecientes exigencias del trabajo. Cuando nuevas personas entran en sus vidas, despertando emociones inesperadas y celos persistentes, empiezan a formarse grietas. La confianza se pone a prueba, las pasiones se desatan y el vínculo que una vez creyeron irrompible empieza a tensarse. Ahora, en una encrucijada, Noah y Nick deben decidir: luchar por el amor que los unió... o arriesgarse a perderlo para siempre.",
+        "poster_path": "/oeOmayFaiGz6km5vShPpDBQnZf1.jpg",
+        "backdrop_path": "/wQOhbCP6H8bO5ddlXDZT207orew.jpg",
+        "release_date": "2026-06-17",
+        "vote_average": 7.567,
+        "popularity": 193.8964
+      },
+      {
+        "id": 1703103,
+        "title": "Addicted to Change",
+        "overview": "",
+        "poster_path": "/7Eewbbdv7MRsV87jlRWvwp1EFFE.jpg",
+        "backdrop_path": "/ts3Q7z59RdDZpqsE7dvtgWszKkj.jpg",
+        "release_date": "2026-07-30",
+        "vote_average": 0,
+        "popularity": 0.4486
+      }
+    ],
+    "series": [
+      {
+        "id": 283502,
+        "title": "Las tres mellizas",
+        "overview": "",
+        "poster_path": "/5jwVRVIaG0QL03uuMChg7krYRJ5.jpg",
+        "backdrop_path": "/rn1zY5N9fiwokA7ldqMIC6b5qb4.jpg",
+        "release_date": "2027-01-01",
+        "vote_average": 0,
+        "popularity": 0.392
+      }
+    ]
+  },
+  "Disney Plus": {
+    "movies": [
+      {
+        "id": 1715818,
+        "title": "A Spark Into A Flame: Hamilton & Hip Hop",
+        "overview": "",
+        "poster_path": "/lfFxXrQzZPY3LHkNhxwmGgTvWQj.jpg",
+        "backdrop_path": "/7dYBC45o5xXuVw96W8yNjxSb0ID.jpg",
+        "release_date": "2026-06-16",
+        "vote_average": 1,
+        "popularity": 0.7536
+      }
+    ],
+    "series": [
+      {
+        "id": 325035,
+        "title": "King & Princeがまちあわせ in LA",
+        "overview": "",
+        "poster_path": "/ewDZMgoLYi7HrCYXKpqW7pH0w5v.jpg",
+        "backdrop_path": "/oj7DS6GWT2LYVz9JUs83YF7mPeO.jpg",
+        "release_date": "2026-06-17",
+        "vote_average": 0,
+        "popularity": 0.7873
+      }
+    ]
+  },
+  "Max": {
+    "movies": [],
+    "series": []
   }
-]
+}
