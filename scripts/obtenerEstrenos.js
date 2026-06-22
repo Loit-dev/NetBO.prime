@@ -1,7 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 
-const TMDB_TOKEN = process.env.TMDB_API_KEY; 
+// Limpiamos espacios alrededor de la clave por si acaso
+const API_KEY = process.env.TMDB_API_KEY ? process.env.TMDB_API_KEY.trim() : ''; 
 const REGION = 'ES'; 
 
 const PLATAFORMAS = {
@@ -13,36 +14,34 @@ const PLATAFORMAS = {
 
 async function consultarEstrenos() {
   try {
-    if (!TMDB_TOKEN) {
-      throw new Error('Falta la variable de entorno TMDB_API_KEY. Verifica los Secrets de GitHub.');
+    if (!API_KEY) {
+      throw new Error('La clave TMDB_API_KEY está vacía en los Secrets de GitHub.');
     }
 
     const listaFinal = [];
-    const opcionesFetch = {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-        'Authorization': `Bearer ${TMDB_TOKEN.trim()}`
-      }
-    };
 
-    const urlPeliculas = `https://themoviedb.org{REGION}`;
-    const respuesta = await fetch(urlPeliculas, opcionesFetch);
+    // Usamos el método tradicional inyectando la clave directamente en la URL
+    const urlPeliculas = `https://themoviedb.org{API_KEY}&language=es-ES&page=1&region=${REGION}`;
+    console.log('Conectando de forma segura con la API de TMDB...');
+    
+    const respuesta = await fetch(urlPeliculas);
     
     if (!respuesta.ok) {
-      throw new Error(`Error en la API de TMDB: ${respuesta.status} ${respuesta.statusText}`);
+      throw new Error(`Error en TMDB: status ${respuesta.status}. Verifica que tu clave sea la correcta.`);
     }
 
     const datos = await respuesta.json();
 
     if (!datos.results || datos.results.length === 0) {
-      throw new Error('No se recibieron películas de la API.');
+      throw new Error('La respuesta vino vacía.');
     }
+
+    console.log(`Buscando streaming para ${datos.results.length} títulos...`);
 
     for (const pelicula of datos.results) {
       try {
-        const providersUrl = `https://themoviedb.org{pelicula.id}/watch/providers`;
-        const providersRes = await fetch(providersUrl, opcionesFetch);
+        const providersUrl = `https://themoviedb.org{pelicula.id}/watch/providers?api_key=${API_KEY}`;
+        const providersRes = await fetch(providersUrl);
         
         if (!providersRes.ok) continue;
         
@@ -65,7 +64,7 @@ async function consultarEstrenos() {
           }
         }
       } catch (err) {
-        console.log(`Error saltable procesando película ${pelicula.id}:`, err.message);
+        // Ignorar errores menores de una película individual
       }
     }
 
@@ -75,10 +74,11 @@ async function consultarEstrenos() {
     }
 
     fs.writeFileSync(rutaArchivo, JSON.stringify(listaFinal, null, 2));
-    console.log(`¡Éxito! Sincronizados ${listaFinal.length} estrenos de forma correcta.`);
+    console.log(`¡Éxito total! Sincronizados de manera automática ${listaFinal.length} estrenos.`);
 
   } catch (error) {
-    console.error('Error ejecución:', error.message);
+    console.error('\n❌ ERROR CRÍTICO:');
+    console.error(error.message);
     process.exit(1);
   }
 }
