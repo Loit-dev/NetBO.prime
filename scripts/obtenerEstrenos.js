@@ -2,11 +2,14 @@ const fs = require('fs');
 const path = require('path');
 const https = require('https');
 
-// Lee tu clave secreta de los Secrets de GitHub de forma segura
-const API_KEY = process.env.TMDB_API_KEY ? process.env.TMDB_API_KEY.trim() : ''; 
-const REGION = 'ES'; // Filtra los catálogos disponibles en España
+// Lee la API KEY desde GitHub Secrets
+const API_KEY = process.env.TMDB_API_KEY
+  ? process.env.TMDB_API_KEY.trim()
+  : '';
 
-// IDs de plataformas de streaming en la base de datos de TMDB
+const REGION = 'ES';
+
+// IDs oficiales de proveedores en TMDB
 const PLATAFORMAS = {
   8: 'Netflix',
   337: 'Disney Plus',
@@ -14,59 +17,88 @@ const PLATAFORMAS = {
   384: 'HBO Max / Max'
 };
 
-// Función nativa para conectarse a internet de forma segura sin fallos de red
+// Función HTTPS segura
 function hacerPeticion(url) {
   return new Promise((resolve, reject) => {
-    https.get(url, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
-      }
-    }, (res) => {
-      let data = '';
-      res.on('data', (chunk) => data += chunk);
-      res.on('end', () => {
-        if (res.statusCode >= 200 && res.statusCode < 300) {
-          try {
-            resolve(JSON.parse(data));
-          } catch (e) {
-            reject(new Error('Error al procesar el JSON de respuesta'));
+    https
+      .get(
+        url,
+        {
+          headers: {
+            'User-Agent': 'Mozilla/5.0'
           }
-        } else {
-          reject(new Error(`Servidor de TMDB respondió con código HTTP ${res.statusCode}`));
+        },
+        (res) => {
+          let data = '';
+
+          res.on('data', (chunk) => {
+            data += chunk;
+          });
+
+          res.on('end', () => {
+            if (res.statusCode >= 200 && res.statusCode < 300) {
+              try {
+                resolve(JSON.parse(data));
+              } catch (e) {
+                reject(
+                  new Error('Error al procesar el JSON de respuesta')
+                );
+              }
+            } else {
+              reject(
+                new Error(
+                  `Servidor TMDB respondió con HTTP ${res.statusCode}`
+                )
+              );
+            }
+          });
         }
+      )
+      .on('error', (err) => {
+        reject(err);
       });
-    }).on('error', (err) => reject(err));
   });
 }
 
 async function consultarEstrenos() {
   try {
+    // Verifica API KEY
     if (!API_KEY) {
-      throw new Error('La clave TMDB_API_KEY está vacía en los Secrets de GitHub.');
+      throw new Error(
+        'La clave TMDB_API_KEY está vacía en GitHub Secrets.'
+      );
     }
 
     const listaFinal = [];
-    
-    // Dirección oficial de TMDB para obtener películas en cartelera y novedades
-    const urlPeliculas = 'https://themoviedb.org' + API_KEY + '&language=es-ES&page=1&region=' + REGION;
-    
-    console.log('Conectando con la API de TMDB mediante HTTPS nativo...');
+
+    // Endpoint oficial TMDB
+    const urlPeliculas =
+      `https://api.themoviedb.org/3/movie/now_playing?api_key=${API_KEY}&language=es-ES&page=1&region=${REGION}`;
+
+    console.log('Conectando con TMDB...');
+
     const datos = await hacerPeticion(urlPeliculas);
 
     if (!datos.results || datos.results.length === 0) {
-      throw new Error('La respuesta vino vacía.');
+      throw new Error('TMDB devolvió una respuesta vacía.');
     }
 
-    console.log('Buscando proveedores para los títulos encontrados...');
+    console.log('Buscando plataformas de streaming...');
 
-    // Recorremos cada película para saber en qué plataforma de streaming está disponible
+    // Recorremos películas
     for (const pelicula of datos.results) {
       try {
-        const providersUrl = 'https://themoviedb.org' + pelicula.id + '/watch/providers?api_key=' + API_KEY;
+        // Endpoint proveedores
+        const providersUrl =
+          `https://api.themoviedb.org/3/movie/${pelicula.id}/watch/providers?api_key=${API_KEY}`;
+
         const providersDatos = await hacerPeticion(providersUrl);
-        const paisDatos = providersDatos.results ? providersDatos.results[REGION] : null;
-        
-        // Si la película está en streaming por suscripción fija (flatrate) en tu país
+
+        const paisDatos = providersDatos.results
+          ? providersDatos.results[REGION]
+          : null;
+
+        // Si existe streaming por suscripción
         if (paisDatos && paisDatos.flatrate) {
           for (const proveedor of paisDatos.flatrate) {
             if (PLATAFORMAS[proveedor.provider_id]) {
@@ -78,24 +110,41 @@ async function consultarEstrenos() {
                 release_date: pelicula.release_date,
                 plataforma: PLATAFORMAS[proveedor.provider_id]
               });
-              break; // Si ya encontramos su plataforma, pasamos a la siguiente película
+
+              // Ya encontramos plataforma
+              break;
             }
           }
         }
       } catch (err) {
-        // Ignorar fallos en películas individuales para que el script no se detenga
+        console.log(
+          `Error consultando proveedores para película ${pelicula.id}`
+        );
       }
     }
 
-    // Guardamos los resultados en la carpeta data/estrenos.json
-    const rutaArchivo = path.join(__dirname, '../data/estrenos.json');
+    // Guardar JSON
+    const rutaArchivo = path.join(
+      __dirname,
+      '../data/estrenos.json'
+    );
+
+    // Crear carpeta si no existe
     if (!fs.existsSync(path.dirname(rutaArchivo))) {
-      fs.mkdirSync(path.dirname(rutaArchivo), { recursive: true });
+      fs.mkdirSync(path.dirname(rutaArchivo), {
+        recursive: true
+      });
     }
 
-    fs.writeFileSync(rutaArchivo, JSON.stringify(listaFinal, null, 2));
-    console.log('¡Éxito total! Sincronizados de forma correcta ' + listaFinal.length + ' estrenos.');
+    // Escribir archivo
+    fs.writeFileSync(
+      rutaArchivo,
+      JSON.stringify(listaFinal, null, 2)
+    );
 
+    console.log(
+      `✅ Éxito: ${listaFinal.length} estrenos sincronizados correctamente.`
+    );
   } catch (error) {
     console.error('\n❌ ERROR CRÍTICO DETECTADO:');
     console.error(error.message);
@@ -103,4 +152,5 @@ async function consultarEstrenos() {
   }
 }
 
+// Ejecutar script
 consultarEstrenos();
