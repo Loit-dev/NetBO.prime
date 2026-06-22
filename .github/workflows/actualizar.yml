@@ -31,7 +31,7 @@ jobs:
           git config --global user.name "Streaming Bot"
           git config --global user.email "bot@tusitio.com"
 
-          git add data/estrenos.json
+          git add frontend/public/estrenos.json
 
           git diff --cached --quiet && echo "Sin cambios" && exit 0
 
