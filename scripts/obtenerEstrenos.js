@@ -2,9 +2,11 @@ const fs = require('fs');
 const path = require('path');
 const https = require('https');
 
+// Lee tu clave secreta de los Secrets de GitHub de forma segura
 const API_KEY = process.env.TMDB_API_KEY ? process.env.TMDB_API_KEY.trim() : ''; 
-const REGION = 'ES'; 
+const REGION = 'ES'; // Filtra los catálogos disponibles en España
 
+// IDs de plataformas de streaming en la base de datos de TMDB
 const PLATAFORMAS = {
   8: 'Netflix',
   337: 'Disney Plus',
@@ -12,6 +14,7 @@ const PLATAFORMAS = {
   384: 'HBO Max / Max'
 };
 
+// Función nativa para conectarse a internet de forma segura sin fallos de red
 function hacerPeticion(url) {
   return new Promise((resolve, reject) => {
     https.get(url, {
@@ -44,7 +47,7 @@ async function consultarEstrenos() {
 
     const listaFinal = [];
     
-    // Dirección oficial e infalible de la API de TMDB
+    // Dirección oficial de TMDB para obtener películas en cartelera y novedades
     const urlPeliculas = 'https://themoviedb.org' + API_KEY + '&language=es-ES&page=1&region=' + REGION;
     
     console.log('Conectando con la API de TMDB mediante HTTPS nativo...');
@@ -56,12 +59,14 @@ async function consultarEstrenos() {
 
     console.log('Buscando proveedores para los títulos encontrados...');
 
+    // Recorremos cada película para saber en qué plataforma de streaming está disponible
     for (const pelicula of datos.results) {
       try {
         const providersUrl = 'https://themoviedb.org' + pelicula.id + '/watch/providers?api_key=' + API_KEY;
         const providersDatos = await hacerPeticion(providersUrl);
         const paisDatos = providersDatos.results ? providersDatos.results[REGION] : null;
         
+        // Si la película está en streaming por suscripción fija (flatrate) en tu país
         if (paisDatos && paisDatos.flatrate) {
           for (const proveedor of paisDatos.flatrate) {
             if (PLATAFORMAS[proveedor.provider_id]) {
@@ -73,15 +78,16 @@ async function consultarEstrenos() {
                 release_date: pelicula.release_date,
                 plataforma: PLATAFORMAS[proveedor.provider_id]
               });
-              break; 
+              break; // Si ya encontramos su plataforma, pasamos a la siguiente película
             }
           }
         }
       } catch (err) {
-        // Ignorar fallos en películas individuales
+        // Ignorar fallos en películas individuales para que el script no se detenga
       }
     }
 
+    // Guardamos los resultados en la carpeta data/estrenos.json
     const rutaArchivo = path.join(__dirname, '../data/estrenos.json');
     if (!fs.existsSync(path.dirname(rutaArchivo))) {
       fs.mkdirSync(path.dirname(rutaArchivo), { recursive: true });
