@@ -7,14 +7,6 @@ const API_KEY = process.env.TMDB_API_KEY?.trim();
 const REGION = "ES";
 const LANGUAGE = "es-ES";
 
-/* 🧠 PLATAFORMAS */
-const PLATFORMS = {
-  8: "Netflix",
-  337: "Disney Plus",
-  119: "Amazon Prime Video",
-  384: "Max",
-};
-
 function request(url) {
   return new Promise((resolve, reject) => {
     https
@@ -27,87 +19,113 @@ function request(url) {
   });
 }
 
-/* 🎯 FETCH PROVIDER DATA (CLAVE JUSTWATCH) */
-async function getWithProviders(type, providerId) {
-  const url =
-    `https://api.themoviedb.org/3/discover/${type}` +
-    `?api_key=${API_KEY}` +
-    `&language=${LANGUAGE}` +
-    `&sort_by=popularity.desc` +
-    `&with_watch_providers=${providerId}` +
-    `&watch_region=${REGION}` +
-    `&include_adult=false` +
-    `&page=1`;
-
+async function get(url) {
   const data = await request(url);
   return data.results || [];
 }
 
-/* 🔥 TRENDING GLOBAL */
-async function trending(type) {
-  const url =
-    `https://api.themoviedb.org/3/trending/${type}/week` +
-    `?api_key=${API_KEY}&language=${LANGUAGE}`;
+/* 🧠 CLASIFICACIÓN TIMELINE */
+function classify(item) {
+  const dateStr = item.release_date || item.first_air_date;
+  if (!dateStr) return "normal";
 
-  const data = await request(url);
-  return data.results || [];
+  const date = new Date(dateStr);
+  const now = new Date();
+
+  const diffDays = (date - now) / (1000 * 60 * 60 * 24);
+
+  if (diffDays >= -7 && diffDays <= 7) return "recent";
+  if (diffDays > 7) return "upcoming";
+  if (diffDays >= -30) return "normal";
+
+  return "old";
 }
 
-/* 🧠 DEDUPE */
+/* 🧠 SCORE TIMELINE */
+function score(item) {
+  const dateStr = item.release_date || item.first_air_date;
+  if (!dateStr) return 9999;
+
+  const date = new Date(dateStr);
+  const now = new Date();
+
+  const diffDays = (date - now) / (1000 * 60 * 60 * 24);
+
+  if (diffDays < -7) return 0 + diffDays;
+  if (diffDays >= -7 && diffDays <= 7) return 1000;
+  if (diffDays > 7) return 2000 + diffDays;
+
+  return 9999;
+}
+
+/* 🎬 MOVIES */
+async function getMovies() {
+  const trending = await get(
+    `https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}&language=${LANGUAGE}`
+  );
+
+  const upcoming = await get(
+    `https://api.themoviedb.org/3/movie/upcoming?api_key=${API_KEY}&language=${LANGUAGE}&region=${REGION}`
+  );
+
+  const discover = await get(
+    `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=${LANGUAGE}&sort_by=release_date.desc&page=1`
+  );
+
+  return [...trending, ...upcoming, ...discover]
+    .filter((m) => m.poster_path)
+    .map((m) => ({
+      ...m,
+      status: classify(m),
+      release_date: m.release_date,
+    }))
+    .sort((a, b) => score(a) - score(b));
+}
+
+/* 📺 SERIES */
+async function getSeries() {
+  const trending = await get(
+    `https://api.themoviedb.org/3/trending/tv/week?api_key=${API_KEY}&language=${LANGUAGE}`
+  );
+
+  const airing = await get(
+    `https://api.themoviedb.org/3/tv/airing_today?api_key=${API_KEY}&language=${LANGUAGE}&region=${REGION}`
+  );
+
+  const onair = await get(
+    `https://api.themoviedb.org/3/tv/on_the_air?api_key=${API_KEY}&language=${LANGUAGE}&region=${REGION}`
+  );
+
+  const discover = await get(
+    `https://api.themoviedb.org/3/discover/tv?api_key=${API_KEY}&language=${LANGUAGE}&sort_by=first_air_date.desc&page=1`
+  );
+
+  return [...trending, ...airing, ...onair, ...discover]
+    .filter((s) => s.poster_path)
+    .map((s) => ({
+      ...s,
+      status: classify(s),
+      release_date: s.first_air_date,
+    }))
+    .sort((a, b) => score(a) - score(b));
+}
+
 function dedupe(list) {
   const map = new Map();
   list.forEach((i) => i?.id && map.set(i.id, i));
   return Array.from(map.values());
 }
 
-/* 🎬 BUILD PLATFORM */
-async function buildPlatform(providerId, name, logo) {
-  const movies = await getWithProviders("movie", providerId);
-  const series = await getWithProviders("tv", providerId);
-
-  return {
-    name,
-    logo,
-    movies: movies.slice(0, 50),
-    series: series.slice(0, 50),
-  };
-}
-
 async function main() {
   if (!API_KEY) throw new Error("Missing API KEY");
 
-  console.log("🚀 Generando catálogo JustWatch-like...");
-
-  const trendingMovies = await trending("movie");
-  const trendingSeries = await trending("tv");
-
-  const platforms = {};
-
-  for (const id in PLATFORMS) {
-    const name = PLATFORMS[id];
-
-    console.log("📡 Procesando:", name);
-
-    const data = await buildPlatform(
-      id,
-      name,
-      `/logos/${name.toLowerCase().replace(" ", "")}.png`
-    );
-
-    platforms[name] = data;
-  }
+  const movies = dedupe(await getMovies()).slice(0, 80);
+  const series = dedupe(await getSeries()).slice(0, 80);
 
   const output = {
     updated_at: new Date().toISOString(),
-
-    /* 🔥 CAPA GLOBAL (tipo JustWatch trending) */
-    trending: {
-      movies: dedupe(trendingMovies).slice(0, 30),
-      series: dedupe(trendingSeries).slice(0, 30),
-    },
-
-    /* 📺 CAPA POR PLATAFORMA */
-    platforms,
+    movies,
+    series,
   };
 
   const file = path.join(__dirname, "../frontend/public/estrenos.json");
@@ -116,7 +134,7 @@ async function main() {
 
   fs.writeFileSync(file, JSON.stringify(output, null, 2));
 
-  console.log("✅ JustWatch MVP listo");
+  console.log("✅ Timeline streaming listo");
 }
 
 main();
