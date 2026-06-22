@@ -1,0 +1,32 @@
+name: Actualización Automática de Catálogo
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Se ejecuta automáticamente todos los días a las 00:00 UTC
+  workflow_dispatch: # Te permite activar el robot manualmente cuando quieras
+
+jobs:
+  actualizar-datos:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Clonar el repositorio
+        uses: actions/checkout@v4
+
+      - name: Instalar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Ejecutar Script de Actualización
+        run: node scripts/obtenerEstrenos.js
+        env:
+          TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
+
+      - name: Guardar y subir cambios a GitHub
+        run: |
+          git config --global user.name 'Streaming Bot'
+          git config --global user.email 'bot@tusitio.com'
+          git add data/estrenos.json
+          git commit -am "Actualización automática de estrenos" || exit 0
+          git push
