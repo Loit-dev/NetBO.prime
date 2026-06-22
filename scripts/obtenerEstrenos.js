@@ -7,24 +7,36 @@ const API_KEY = process.env.TMDB_API_KEY?.trim();
 const REGION = "ES";
 const LANGUAGE = "es-ES";
 
+if (!API_KEY) {
+  throw new Error("TMDB_API_KEY no encontrada");
+}
+
 function request(url) {
   return new Promise((resolve, reject) => {
     https
       .get(url, (res) => {
         let data = "";
-        res.on("data", (c) => (data += c));
-        res.on("end", () => resolve(JSON.parse(data)));
+
+        res.on("data", (chunk) => (data += chunk));
+
+        res.on("end", () => {
+          try {
+            resolve(JSON.parse(data));
+          } catch (e) {
+            reject(e);
+          }
+        });
       })
       .on("error", reject);
   });
 }
 
 async function get(url) {
-  const data = await request(url);
-  return data.results || [];
+  const res = await request(url);
+  return res.results || [];
 }
 
-/* 🧠 CLASIFICACIÓN TIMELINE */
+/* 🧠 CLASIFICACIÓN */
 function classify(item) {
   const dateStr = item.release_date || item.first_air_date;
   if (!dateStr) return "normal";
@@ -41,7 +53,7 @@ function classify(item) {
   return "old";
 }
 
-/* 🧠 SCORE TIMELINE */
+/* 📊 SCORE TIMELINE */
 function score(item) {
   const dateStr = item.release_date || item.first_air_date;
   if (!dateStr) return 9999;
@@ -76,8 +88,9 @@ async function getMovies() {
     .filter((m) => m.poster_path)
     .map((m) => ({
       ...m,
-      status: classify(m),
+      title: m.title,
       release_date: m.release_date,
+      status: classify(m),
     }))
     .sort((a, b) => score(a) - score(b));
 }
@@ -104,21 +117,20 @@ async function getSeries() {
     .filter((s) => s.poster_path)
     .map((s) => ({
       ...s,
-      status: classify(s),
+      title: s.name,
       release_date: s.first_air_date,
+      status: classify(s),
     }))
     .sort((a, b) => score(a) - score(b));
 }
 
-function dedupe(list) {
+function dedupe(arr) {
   const map = new Map();
-  list.forEach((i) => i?.id && map.set(i.id, i));
-  return Array.from(map.values());
+  arr.forEach((i) => map.set(i.id, i));
+  return [...map.values()];
 }
 
 async function main() {
-  if (!API_KEY) throw new Error("Missing API KEY");
-
   const movies = dedupe(await getMovies()).slice(0, 80);
   const series = dedupe(await getSeries()).slice(0, 80);
 
@@ -128,13 +140,17 @@ async function main() {
     series,
   };
 
-  const file = path.join(__dirname, "../frontend/public/estrenos.json");
+  /* ✅ RUTA FIJA Y ROBUSTA */
+  const file = path.resolve(process.cwd(), "frontend/public/estrenos.json");
 
   fs.mkdirSync(path.dirname(file), { recursive: true });
 
   fs.writeFileSync(file, JSON.stringify(output, null, 2));
 
-  console.log("✅ Timeline streaming listo");
+  console.log("✅ estrenos.json actualizado correctamente");
 }
 
-main();
+main().catch((err) => {
+  console.error("❌ ERROR:", err);
+  process.exit(1);
+});
