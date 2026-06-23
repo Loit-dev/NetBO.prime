@@ -4,19 +4,21 @@ const API_KEY = process.env.TMDB_API_KEY;
 
 function request(url) {
   return new Promise((resolve, reject) => {
-    https.get(url, (res) => {
-      let data = "";
+    https
+      .get(url, (res) => {
+        let data = "";
 
-      res.on("data", (chunk) => (data += chunk));
+        res.on("data", (chunk) => (data += chunk));
 
-      res.on("end", () => {
-        try {
-          resolve(JSON.parse(data));
-        } catch (e) {
-          reject(e);
-        }
-      });
-    }).on("error", reject);
+        res.on("end", () => {
+          try {
+            resolve(JSON.parse(data));
+          } catch (e) {
+            reject(e);
+          }
+        });
+      })
+      .on("error", reject);
   });
 }
 
@@ -37,7 +39,14 @@ async function searchTMDB(title, type) {
 async function enrichItem(item) {
   const tmdb = await searchTMDB(item.title, item.type);
 
-  if (!tmdb) return { ...item, poster_path: null };
+  if (!tmdb) {
+    return {
+      ...item,
+      poster_path: null,
+      overview: null,
+      vote_average: null,
+    };
+  }
 
   return {
     ...item,
